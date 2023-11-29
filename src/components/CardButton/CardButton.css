@@ -1,0 +1,14 @@
+.card-button {
+    border-radius: 6px;
+    padding: 8px 30px;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background-color 0.25s;
+    border: none;
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.card-button:hover {
+    background: rgba(255, 255, 255, 0.10);
+}
