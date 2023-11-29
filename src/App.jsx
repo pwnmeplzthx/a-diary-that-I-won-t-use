@@ -1,6 +1,7 @@
 import './App.css';
 import Header from './components/Header/Header';
 import JournalAddButton from './components/JournalAddButton/JournalAddButton';
+import JournalForm from './components/JournalForm/JournalForm';
 import JournalList from './components/JournalList/JournalList';
 import Main from './layout/main/main';
 import Sidebar from './layout/sidebar/sidebar';
@@ -26,7 +27,7 @@ function App() {
                 <JournalList items={data} />
             </Sidebar>
             <Main>
-                Body
+                <JournalForm />
             </Main>
         </div>
     );

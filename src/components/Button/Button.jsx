@@ -2,17 +2,13 @@ import React from 'react';
 import './Button.css';
 
 const Button = (props) => {
-    const { children } = props;
-
-    const onClickHandler = () => {
-        console.log('click!');
-    };
+    const { children, onClick } = props;
 
     return (
+        // eslint-disable-next-line react/button-has-type
         <button
             className="button accent"
-            type="button"
-            onClick={onClickHandler}
+            onClick={onClick}
         >
             {children}
         </button>
