@@ -1,57 +1,77 @@
-import { useState } from 'react';
+import {
+    useEffect, useReducer, useRef,
+} from 'react';
 import cn from 'classnames';
 import Button from '../Button/Button';
 import cls from './JournalForm.module.css';
+import { formReducer, initialState } from './JournalForm.state';
+import Input from '../Input/Input';
 
 function JournalForm(props) {
     const { onSubmit } = props;
+    const [formState, dispatchForm] = useReducer(formReducer, initialState);
+    const { isValid, isFormReadyToSubmit, values } = formState;
+    const titleRef = useRef();
+    const dateRef = useRef();
+    const postRef = useRef();
 
-    const [formValidState, setFormValidState] = useState({
-        title: true,
-        text: true,
-        date: true,
-    });
-    let isFormValid = true;
+    const focusError = (isValid) => {
+        switch (true) {
+        case !isValid.title: {
+            titleRef.current.focus();
+            break;
+        }
+        case !isValid.date: {
+            dateRef.current.focus();
+            break;
+        }
+        case !isValid.post: {
+            postRef.current.focus();
+            break;
+        }
+        }
+    };
+
+    useEffect(() => {
+        let timerId;
+        if (!formState.isValid.date || !formState.isValid.post || !formState.isValid.title) {
+            focusError(isValid);
+            timerId = setTimeout(() => {
+                dispatchForm({ type: 'RESET_VALIDITY' });
+            }, 2000);
+        }
+        return () => {
+            clearTimeout(timerId);
+        };
+    }, [formState.isValid.date, formState.isValid.post, formState.isValid.title, isValid]);
+
+    useEffect(() => {
+        if (isFormReadyToSubmit) {
+            onSubmit(values);
+            dispatchForm({ type: 'CLEAR' });
+        }
+    }, [isFormReadyToSubmit, onSubmit, values]);
 
     const addJournalItem = (e) => {
         e.preventDefault();
-        const formData = new FormData(e.target);
-        const formProps = Object.fromEntries(formData);
-        if (!formProps.title?.trim().length) {
-            setFormValidState((state) => ({ ...state, title: false }));
-            isFormValid = false;
-        } else {
-            setFormValidState((state) => ({ ...state, title: true }));
-            isFormValid = true;
-        }
-        if (!formProps.text?.trim().length) {
-            setFormValidState((state) => ({ ...state, text: false }));
-            isFormValid = false;
-        } else {
-            setFormValidState((state) => ({ ...state, text: true }));
-            isFormValid = true;
-        }
-        if (!formProps.date) {
-            setFormValidState((state) => ({ ...state, date: false }));
-            isFormValid = false;
-        } else {
-            setFormValidState((state) => ({ ...state, date: true }));
-            isFormValid = true;
-        }
-        if (!isFormValid) return;
+        dispatchForm({ type: 'SUBMIT' });
+    };
 
-        onSubmit(formProps);
+    const onChangehandler = (e) => {
+        dispatchForm({ type: 'SET_VALUE', payload: { [e.target.name]: e.target.value } });
     };
 
     return (
         <form className={cls.journalForm} onSubmit={addJournalItem}>
             <div>
-                <input
+                <Input
                     type="text"
                     name="title"
-                    className={cn(cls.inputTitle, {
-                        [cls.invalid]: !formValidState.title,
-                    })}
+                    value={values.title}
+                    onChange={onChangehandler}
+                    ref={titleRef}
+                    apperence="title"
+                    isValid={formState.isValid.title}
                 />
             </div>
             <div className={cls.formRow}>
@@ -59,16 +79,16 @@ function JournalForm(props) {
                     <img src="/calendar.svg" alt="calendar_icon" />
                     <span>Дата</span>
                 </label>
-                <input type="date" name="date" id="date" className={`${cls.input} ${formValidState.date ? '' : cls.invalid}`} />
+                <Input value={values.date} onChange={onChangehandler} isValid={formState.isValid.date} ref={dateRef} type="date" name="date" id="date" />
             </div>
             <div className={cls.formRow}>
                 <label htmlFor="tag" className={cls.formLabel}>
                     <img src="/folder.svg" alt="tag_icon" />
                     <span>Метки</span>
                 </label>
-                <input type="text" name="tag" id="tag" className={`${cls.input} ${formValidState.text ? '' : cls.invalid}`} />
+                <Input value={values.tag} onChange={onChangehandler} type="text" name="tag" id="tag" />
             </div>
-            <textarea rows="5" cols="30" name="post" className={`${cls.input} ${formValidState.text ? '' : cls.invalid}`} />
+            <textarea value={values.post} onChange={onChangehandler} ref={postRef} rows="5" cols="30" name="post" className={`${cls.input} ${isValid.post ? '' : cls.invalid}`} />
             <Button type="submit">Сохранить</Button>
         </form>
     );
