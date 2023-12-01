@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import './App.css';
 import Header from './components/Header/Header';
 import JournalAddButton from './components/JournalAddButton/JournalAddButton';
@@ -7,18 +8,13 @@ import Main from './layout/main/main';
 import Sidebar from './layout/sidebar/sidebar';
 
 function App() {
-    const data = [
-        {
-            title: 'Первая запись',
-            text: 'Первый текст',
-            date: new Date(),
-        },
-        {
-            title: 'Вторая запись',
-            text: 'Второй текст',
-            date: new Date(),
-        },
-    ];
+    const [data, setData] = useState([]);
+    const onSubmit = (dataItem) => {
+        setData((oldItems) => [...oldItems, {
+            ...dataItem,
+            id: oldItems.length > 0 ? Math.max(...oldItems.map((i) => i.id)) + 1 : 1,
+        }]);
+    };
     return (
         <div className="app">
             <Sidebar>
@@ -27,7 +23,7 @@ function App() {
                 <JournalList items={data} />
             </Sidebar>
             <Main>
-                <JournalForm />
+                <JournalForm onSubmit={onSubmit} />
             </Main>
         </div>
     );

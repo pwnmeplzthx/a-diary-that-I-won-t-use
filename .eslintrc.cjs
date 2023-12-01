@@ -12,6 +12,16 @@ module.exports = {
         'react',
         'react-hooks',
     ],
+    parserOptions: {
+        parser: '@babel/eslint-parser',
+        sourceType: 'module',
+        ecmaVersion: 'latest',
+        ecmaFeatures: {
+            jsx: true,
+            experimentalObjectRestSpread: true,
+        },
+        requireConfigFile: false,
+    },
     rules: {
         'react/jsx-indent': [2, 4],
         'react/jsx-indent-props': [2, 4],
@@ -39,5 +49,7 @@ module.exports = {
         'no-param-reassign': 'off',
         'no-undef': 'off',
         'react/prop-types': 'off',
+        'space-infix-ops': 'off',
+        'jsx-a11y/label-has-associated-control': 'off',
     },
 };
