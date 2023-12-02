@@ -9,7 +9,7 @@ import { formReducer, initialState } from './JournalForm.state';
 import { UserContext } from '../../context/userContext';
 
 function JournalForm(props) {
-    const { onSubmit } = props;
+    const { onSubmit, data, onDelete } = props;
     const [formState, dispatchForm] = useReducer(formReducer, initialState);
     const { isValid, isFormReadyToSubmit, values } = formState;
     const titleRef = useRef();
@@ -35,6 +35,15 @@ function JournalForm(props) {
     };
 
     useEffect(() => {
+        if (!data) {
+            dispatchForm({ type: 'CLEAR' });
+            dispatchForm({ type: 'SET_VALUE', payload: { userId } });
+        } else {
+            dispatchForm({ type: 'SET_VALUE', payload: { ...data } });
+        }
+    }, [data, userId]);
+
+    useEffect(() => {
         let timerId;
         if (!formState.isValid.date || !formState.isValid.post || !formState.isValid.title) {
             focusError(isValid);
@@ -51,8 +60,9 @@ function JournalForm(props) {
         if (isFormReadyToSubmit) {
             onSubmit(values);
             dispatchForm({ type: 'CLEAR' });
+            dispatchForm({ type: 'SET_VALUE', payload: { userId } });
         }
-    }, [isFormReadyToSubmit, onSubmit, values]);
+    }, [isFormReadyToSubmit, onSubmit, userId, values]);
 
     useEffect(() => {
         dispatchForm({ type: 'SET_VALUE', payload: { userId } });
@@ -67,9 +77,15 @@ function JournalForm(props) {
         dispatchForm({ type: 'SET_VALUE', payload: { [e.target.name]: e.target.value } });
     };
 
+    const deleteItemHandler = (id) => {
+        onDelete(id);
+        dispatchForm({ type: 'CLEAR' });
+        dispatchForm({ type: 'SET_VALUE', payload: { userId } });
+    };
+
     return (
         <form className={cls.journalForm} onSubmit={addJournalItem}>
-            <div>
+            <div className={cls.titleWrapper}>
                 <Input
                     type="text"
                     name="title"
@@ -79,6 +95,11 @@ function JournalForm(props) {
                     apperence="title"
                     isValid={formState.isValid.title}
                 />
+                {data?.id && (
+                    <button onClick={() => deleteItemHandler(data.id)} type="button" className={cls.delete}>
+                        <img src="/archive.svg" alt="delete_logo" />
+                    </button>
+                )}
             </div>
             <div className={cls.formRow}>
                 <label htmlFor="date" className={cls.formLabel}>

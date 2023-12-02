@@ -10,7 +10,7 @@ function SelectUser() {
     };
 
     return (
-        <select name="user" id="user" value={userId} onChange={onChangeHandler}>
+        <select className={cls.select} name="user" id="user" value={userId} onChange={onChangeHandler}>
             <option value="1">1</option>
             <option value="2">2</option>
         </select>

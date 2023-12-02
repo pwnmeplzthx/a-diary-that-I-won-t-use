@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import './App.css';
 import Header from './components/Header/Header';
 import JournalAddButton from './components/JournalAddButton/JournalAddButton';
@@ -10,12 +11,33 @@ import Sidebar from './layout/sidebar/sidebar';
 
 function App() {
     const [data, saveData] = useLocalStorage('data');
+    const [selectedItem, setSelectedItem] = useState(null);
 
     const onSubmit = (dataItem) => {
-        saveData([...data, {
-            ...dataItem,
-            id: data.length > 0 ? Math.max(...data.map((i) => i.id)) + 1 : 1,
-        }]);
+        if (!dataItem.id) {
+            saveData([...data, {
+                ...dataItem,
+                id: data.length > 0 ? Math.max(...data.map((i) => i.id)) + 1 : 1,
+            }]);
+        } else {
+            saveData(data.map((item) => {
+                if (item.id === dataItem.id) {
+                    return {
+                        ...dataItem,
+                    };
+                }
+                return item;
+            }));
+        }
+    };
+
+    const deleteItem = (id) => {
+        const newData = data.filter((item) => item.id !== id);
+        if (newData.length !== 0) {
+            saveData(newData);
+        } else {
+            saveData([]);
+        }
     };
 
     return (
@@ -23,11 +45,11 @@ function App() {
             <div className="app">
                 <Sidebar>
                     <Header />
-                    <JournalAddButton />
-                    <JournalList items={data} />
+                    <JournalAddButton clearForm={() => setSelectedItem(null)} />
+                    <JournalList items={data} setItem={setSelectedItem} />
                 </Sidebar>
                 <Main>
-                    <JournalForm onSubmit={onSubmit} />
+                    <JournalForm onSubmit={onSubmit} data={selectedItem} onDelete={deleteItem} />
                 </Main>
             </div>
         </UserContextProvider>

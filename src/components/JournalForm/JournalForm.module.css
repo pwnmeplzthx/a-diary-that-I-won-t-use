@@ -30,6 +30,24 @@
     min-width: 100px;
 }
 
+.titleWrapper {
+    display: flex;
+}
+
+.delete {
+    border: none;
+    background: none;
+    cursor: pointer;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+}
+
+.delete:hover {
+    background: rgb(255, 255, 255, 0.05);
+    border-radius: 50%;
+}
+
 .invalid {
     border: 1px solid red;
     background: rgb(141, 38, 38);
